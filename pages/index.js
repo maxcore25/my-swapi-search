@@ -5,27 +5,41 @@ import styles from '../styles/Home.module.css';
 
 export default function Home({ people }) {
   const inputRef = useRef();
+  const resultsRef = useRef();
+
+  const [query, setQuery] = useState();
+  const results = people.filter(
+    ({ name }) => query && name.toLowerCase().includes(query.toLowerCase())
+  );
+  const hasResults = results && results.length > 0;
 
   useEffect(() => {
     inputRef.current.focus();
   }, []);
 
   useEffect(() => {
-    document.body.addEventListener('keydown', onKeyDown);
+    if (hasResults) document.body.addEventListener('keydown', onKeyDown);
+    else document.body.removeEventListener('keydown', onKeyDown);
 
     return () => {
       document.body.removeEventListener('keydown', onKeyDown);
     };
-  }, []);
+  }, [hasResults]);
 
-  function onKeyDown() {}
+  function onKeyDown(event) {
+    const isUp = event.key === 'ArrowUp';
+    const isDown = event.key === 'ArrowDown';
 
-  const [query, setQuery] = useState();
+    const resultsItems = Array.from(resultsRef.current.children);
 
-  const results = people.filter(
-    ({ name }) => query && name.toLowerCase().includes(query.toLowerCase())
-  );
-  const hasResults = results && results.length > 0;
+    if (isUp) {
+      console.log();
+    }
+    if (isDown) {
+      console.log();
+      resultsItems[0].querySelector('a').focus();
+    }
+  }
 
   /**
    * handleOnChange
@@ -54,7 +68,7 @@ export default function Home({ people }) {
           />
           {hasResults && (
             <div className={styles.autocomplete}>
-              <ul className={styles.people}>
+              <ul ref={resultsRef} className={styles.people}>
                 {results.map(result => {
                   return (
                     <li key={result.url}>
